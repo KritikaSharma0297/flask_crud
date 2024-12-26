@@ -58,8 +58,8 @@ class UserList(Resource):
             _name = request.form['name']
             _email = request.form['email']
             _phone = request.form['phone']
-            insert_user_cmd = """INSERT INTO employee(name, email, phone) 
-                                VALUES(%s, %s, %s)"""
+            insert_user_cmd = "INSERT INTO employee(name, email, phone) 
+                                VALUES(%s, %s, %s)"
             
             cursor.execute(insert_user_cmd, (_name, _email, _phone))
             conn.commit()
@@ -99,7 +99,7 @@ class User(Resource):
             name = request.form['name'] 
             email = request.form['email'] 
             phone = request.form['phone'] 
-            update_user_cmd = """UPDATE employee SET name=%s, email=%s, phone=%s WHERE id=%s""" 
+            update_user_cmd = "UPDATE employee SET name=%s, email=%s, phone=%s WHERE id=%s" 
             cursor.execute(update_user_cmd, (name, email, phone, id)) 
             conn.commit() 
             response = jsonify('User updated successfully.') 
