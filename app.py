@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flaskext.mysql import MySQL
 from flask_restful import Resource, Api
+from flask_httpauth import HTTPBasicAuth
 
 #Create an instance of Flask
 app = Flask(__name__)
@@ -11,6 +12,9 @@ mysql = MySQL()
 #Create an instance of Flask RESTful API
 api = Api(app)
 
+# Create an instance of HTTP Basic Auth 
+auth = HTTPBasicAuth()
+
 #Set database credentials in config.
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'Kritika@1997'
@@ -20,6 +24,16 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 #Initialize the MySQL extension
 mysql.init_app(app)
 
+users = {
+    "ENCORA" : "encora",
+    }
+
+@auth.get_password
+def get_pw(username):
+    if username in users: 
+        return users[username]
+    return None
+
 
 #Get All Users, or Create a new user
 class UserList(Resource):
@@ -27,7 +41,7 @@ class UserList(Resource):
         try:
             conn = mysql.connect()
             cursor = conn.cursor()
-            cursor.execute("""select * from employee""")
+            cursor.execute("select * from employee")
             rows = cursor.fetchall()
             return jsonify(rows)
         except Exception as e:
@@ -36,6 +50,7 @@ class UserList(Resource):
             cursor.close()
             conn.close()
 
+    @auth.login_required
     def post(self):
         try:
             conn = mysql.connect()
@@ -62,6 +77,7 @@ class UserList(Resource):
             
 #Get a user by id, update or delete user
 class User(Resource):
+    @auth.login_required
     def get(self, id):
         try:
             conn = mysql.connect()
@@ -75,6 +91,7 @@ class User(Resource):
             cursor.close()
             conn.close()
 
+    @auth.login_required
     def put(self, id): 
         try: 
             conn = mysql.connect() 
@@ -94,8 +111,9 @@ class User(Resource):
         finally: 
             cursor.close() 
             conn.close() 
-            return (response)       
-
+            return (response)    
+           
+    @auth.login_required
     def delete(self, id):
         try:
             conn = mysql.connect()
